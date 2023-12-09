@@ -15,21 +15,15 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.connectapp.MainActivity;
-import com.example.connectapp.R;
 import com.example.connectapp.databinding.ActivitySignUpBinding;
 import com.example.connectapp.utilities.Constants;
 import com.example.connectapp.utilities.PreferenceManager;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.regex.Pattern;
 
 public class SignUpActivity extends AppCompatActivity {
     private ActivitySignUpBinding binding;

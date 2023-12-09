@@ -62,17 +62,32 @@
             android:importantForAutofill="no"
             android:textSize="@dimen/_13ssp"
             android:textColor="@color/primary_text"/>
-        
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttonSignIn"
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_50sdp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_20sdp"
-            android:textColor="@color/white"
-            android:text="@string/iniciar_ses_on"
-            android:textSize="@dimen/_13ssp"
-            android:textStyle="bold"
-            app:cornerRadius="@dimen/_5sdp"/>
+            android:animateLayoutChanges="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonSignIn"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_50sdp"
+                android:textColor="@color/white"
+                android:text="@string/iniciar_ses_on"
+                android:textSize="@dimen/_13ssp"
+                android:textStyle="bold"
+                app:cornerRadius="@dimen/_5sdp"/>
+            <ProgressBar
+                android:layout_width="@dimen/_25sdp"
+                android:layout_height="@dimen/_25sdp"
+                android:id="@+id/progressBar"
+                android:layout_centerInParent="true"
+                android:visibility="invisible"/>
+
+        </RelativeLayout>
+        
+
 
         <TextView
             android:id="@+id/textCreateNewAccount"
