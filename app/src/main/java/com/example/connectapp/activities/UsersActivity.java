@@ -3,6 +3,7 @@ package com.example.connectapp.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -10,6 +11,7 @@ import android.widget.Toast;
 import com.example.connectapp.R;
 import com.example.connectapp.adapters.UsersAdapter;
 import com.example.connectapp.databinding.ActivityUsersBinding;
+import com.example.connectapp.listeners.UserListener;
 import com.example.connectapp.models.Users;
 import com.example.connectapp.utilities.Constants;
 import com.example.connectapp.utilities.PreferenceManager;
@@ -20,7 +22,7 @@ import com.google.firebase.firestore.auth.User;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UsersActivity extends AppCompatActivity {
+public class UsersActivity extends AppCompatActivity implements UserListener {
     private ActivityUsersBinding binding;
     private PreferenceManager preferenceManager;
     @Override
@@ -55,10 +57,11 @@ public class UsersActivity extends AppCompatActivity {
                             user.email = documentSnapshot.getString(Constants.KEY_EMAIL);
                             user.image = documentSnapshot.getString(Constants.KEY_IMAGE);
                             user.token = documentSnapshot.getString(Constants.KEY_FCM_TOKEN);
+                            user.id = documentSnapshot.getId();
                             listaUsers.add(user);
                         }
                         if(listaUsers.size()>0){
-                            UsersAdapter usersAdapter = new UsersAdapter(listaUsers);
+                            UsersAdapter usersAdapter = new UsersAdapter(listaUsers,this);
                             binding.usersRecycleView.setAdapter(usersAdapter);
                             binding.usersRecycleView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                             binding.usersRecycleView.setVisibility(View.VISIBLE);
@@ -85,5 +88,13 @@ public class UsersActivity extends AppCompatActivity {
     }
     private void showToast(String message){
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onUserClicked(Users user) {
+        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+        intent.putExtra(Constants.KEY_USER,user);
+        startActivity(intent);
+        finish();
     }
 }
