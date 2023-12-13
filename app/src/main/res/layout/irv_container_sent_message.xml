@@ -2,14 +2,18 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/_8sdp"
     android:padding="@dimen/_4sdp">
 
     <TextView
         android:id="@+id/textMessage"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/background_sent_message"
-        android:padding="@dimen/_12sdp"
+        android:paddingStart="@dimen/_12sdp"
+        android:paddingEnd="@dimen/_12sdp"
+        android:paddingTop="@dimen/_8sdp"
+        android:paddingBottom="@dimen/_8sdp"
         android:textColor="@color/white"
         android:textSize="@dimen/_13ssp"
         android:layout_alignParentEnd="true"
@@ -20,7 +24,7 @@
         android:layout_height="wrap_content"
         android:text="marzo"
         android:textColor="@color/secondary_text"
-        android:textSize="@dimen/_10ssp"
+        android:textSize="@dimen/_8ssp"
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/textMessage"
         android:layout_marginTop="@dimen/_4sdp"/>

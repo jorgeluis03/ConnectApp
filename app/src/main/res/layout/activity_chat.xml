@@ -65,7 +65,9 @@
         android:clipToPadding="false"
         android:orientation="vertical"
         android:overScrollMode="never"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        app:stackFromEnd="true"/> <!--el último elemento de la lista será el primero visible en la pantalla.-->
+
 
     <ProgressBar
         android:id="@+id/progressBar"
