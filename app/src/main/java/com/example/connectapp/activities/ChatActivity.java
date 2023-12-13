@@ -82,7 +82,7 @@ public class ChatActivity extends AppCompatActivity {
             conversion.put(Constants.KEY_SENDER_NAME,preferenceManager.getString(Constants.KEY_NAME));
             conversion.put(Constants.KEY_SENDER_IMAGE,preferenceManager.getString(Constants.KEY_IMAGE));
             conversion.put(Constants.KEY_RECEIVER_ID,receiverUser.id);
-            conversion.put(Constants.KEY_RECEIVER_IMAGE,receiverUser.name);
+            conversion.put(Constants.KEY_RECEIVER_NAME,receiverUser.name);
             conversion.put(Constants.KEY_RECEIVER_IMAGE,receiverUser.image);
             conversion.put(Constants.KEY_LAST_MESSAGE,binding.inputMessage.getText().toString().trim());
             conversion.put(Constants.KEY_TIMESTAMP, new Date());

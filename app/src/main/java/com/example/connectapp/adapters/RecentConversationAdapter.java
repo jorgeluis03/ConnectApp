@@ -10,15 +10,19 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.connectapp.databinding.IrvContainerRecentConversionBinding;
+import com.example.connectapp.listeners.ConversionListener;
 import com.example.connectapp.models.ChatMessage;
+import com.example.connectapp.models.Users;
 
 import java.util.List;
 
 public class RecentConversationAdapter extends RecyclerView.Adapter<RecentConversationAdapter.ConversionViewHolder>{
     private final List<ChatMessage> listChatMessages;
+    private final ConversionListener conversionListener;
 
-    public RecentConversationAdapter(List<ChatMessage> listChatMessages) {
+    public RecentConversationAdapter(List<ChatMessage> listChatMessages, ConversionListener conversionListener) {
         this.listChatMessages = listChatMessages;
+        this.conversionListener = conversionListener;
     }
 
     @NonNull
@@ -50,6 +54,13 @@ public class RecentConversationAdapter extends RecyclerView.Adapter<RecentConver
             binding.imageProfile.setImageBitmap(getConversionImage(chatMessage.conversionImage));
             binding.textName.setText(chatMessage.conversionName);
             binding.textRecentConversation.setText(chatMessage.message);
+            binding.getRoot().setOnClickListener(v -> {
+                Users user = new Users();
+                user.id = chatMessage.conversionId;
+                user.name = chatMessage.conversionName;
+                user.image = chatMessage.conversionImage;
+                conversionListener.onConversionClicked(user);
+            });
         }
     }
     private Bitmap getConversionImage(String encodedImage){ //devule el tipo de imagen Bitmap para ponerla en la ImageView
