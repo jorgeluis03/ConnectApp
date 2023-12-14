@@ -37,8 +37,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends BaseActivity {
     private ActivityChatBinding binding;
     private Users receiverUser;
     private List<ChatMessage> chatMessageList;
@@ -46,6 +47,8 @@ public class ChatActivity extends AppCompatActivity {
     private PreferenceManager preferenceManager;
     private FirebaseFirestore db;
     private String conversionId=null;
+    private boolean isReceiverAvailabble= false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +93,28 @@ public class ChatActivity extends AppCompatActivity {
         }
         binding.inputMessage.setText(null);
 
+    }
+
+    private void listenAvailabilityOfReceiver(){ //verifica si el campo disponible del usuario con el que chatea esta marcado como online o no
+        db.collection(Constants.KEY_COLLECION_USERS).document(receiverUser.id)
+                .addSnapshotListener(ChatActivity.this, (value, error) -> { /* el Listener está asociado con la instancia de ChatActivity. Específicamente, está asociado al ciclo de vida de la actividad ChatActivity.*/
+                    if (error!=null){
+                        Log.w("Error",error);
+                        return;
+                    }
+
+                    if(value.getLong(Constants.KEY_AVAILABILITY)!=null){ /*intenta obtener un valor numérico (en este caso, un Long) asociado con esa clave dentro del documento.*/
+                        int availability = Objects.requireNonNull(value.getLong(Constants.KEY_AVAILABILITY)).intValue(); /* para asegurarse de que value.getLong(Constants.KEY_AVAILABILITY) no sea nulo. y convierte ese valor a un int*/
+                        isReceiverAvailabble = availability==1;
+                    }
+
+                    if (isReceiverAvailabble){
+                        binding.linearLayoutAvailability.setVisibility(View.VISIBLE);
+                    }else {
+                        binding.linearLayoutAvailability.setVisibility(View.GONE);
+                    }
+
+                });
     }
 
     private void listenMessages(){
@@ -203,4 +228,10 @@ public class ChatActivity extends AppCompatActivity {
 
         }
     };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        listenAvailabilityOfReceiver();
+    }
 }
