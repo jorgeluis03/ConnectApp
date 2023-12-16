@@ -1,5 +1,6 @@
 package com.example.connectapp.activities;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -10,12 +11,15 @@ import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.connectapp.R;
 import com.example.connectapp.adapters.ChatAdapter;
 import com.example.connectapp.databinding.ActivityChatBinding;
 import com.example.connectapp.models.ChatMessage;
 import com.example.connectapp.models.Users;
+import com.example.connectapp.network.ApiClient;
+import com.example.connectapp.network.ApiService;
 import com.example.connectapp.utilities.Constants;
 import com.example.connectapp.utilities.PreferenceManager;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,6 +34,10 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +46,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ChatActivity extends BaseActivity {
     private ActivityChatBinding binding;
@@ -91,8 +103,70 @@ public class ChatActivity extends BaseActivity {
             conversion.put(Constants.KEY_TIMESTAMP, new Date());
             addConversion(conversion);
         }
+
+        if (!isReceiverAvailabble){//si el otro usuario no esta online entonces le enviamos la notificaion del mensaje
+            try {
+                JSONArray tokens = new JSONArray();
+                tokens.put(receiverUser.token); //token del usuario con el que estamos chateando | a quien le manda el mensaje
+
+                JSONObject data = new JSONObject();
+                data.put(Constants.KEY_USER_ID,preferenceManager.getString(Constants.KEY_USER_ID)); //identidicador de quien manda el mensaje
+                data.put(Constants.KEY_NAME,preferenceManager.getString(Constants.KEY_NAME)); //Nombre de quien manda el mensaje
+                data.put(Constants.KEY_FCM_TOKEN,preferenceManager.getString(Constants.KEY_FCM_TOKEN)); //Token de quien manda el mensaje
+                data.put(Constants.KEY_MESSAGE,binding.inputMessage.getText().toString().trim()); //mensaje del input
+
+                JSONObject body = new JSONObject();
+                body.put(Constants.REMOTE_MSG_DATA,data); // envia la data anterior
+                body.put(Constants.REMOTE_MSG_REGISTRATION_IDS,tokens); // token del usuario destino
+
+                sendNotification(body.toString());//Envio de notificacion
+
+
+            }catch (Exception e){
+                showToast(e.getMessage());
+            }
+        }
+
         binding.inputMessage.setText(null);
 
+    }
+    private void sendNotification(String messageBody){
+        ApiClient.getClient().create(ApiService.class)
+                .sendMessage(Constants.getRemoteMsgHeaders(),messageBody)
+                .enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+                        if(response.isSuccessful()){
+                            try {
+                                if(response.body()!=null){
+                                    JSONObject responseJson = new JSONObject(response.body());
+                                    JSONArray results = responseJson.getJSONArray("results");
+
+                                    if(responseJson.getInt("failure")==1){
+                                        JSONObject error = (JSONObject) results.get(0);
+                                        showToast(error.getString("error"));
+                                        return;
+                                    }
+                                }
+                            }catch (JSONException e){
+                                e.printStackTrace();
+                            }
+                            showToast("Notification send successfully");
+
+                        }else {
+                            showToast("Error: "+response.code());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+
+                    }
+                });
+
+    }
+    public void showToast(String message){
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     private void listenAvailabilityOfReceiver(){ //verifica si el campo disponible del usuario con el que chatea esta marcado como online o no
@@ -106,6 +180,12 @@ public class ChatActivity extends BaseActivity {
                     if(value.getLong(Constants.KEY_AVAILABILITY)!=null){ /*intenta obtener un valor numérico (en este caso, un Long) asociado con esa clave dentro del documento.*/
                         int availability = Objects.requireNonNull(value.getLong(Constants.KEY_AVAILABILITY)).intValue(); /* para asegurarse de que value.getLong(Constants.KEY_AVAILABILITY) no sea nulo. y convierte ese valor a un int*/
                         isReceiverAvailabble = availability==1;
+                    }
+                    receiverUser.token = value.getString(Constants.KEY_FCM_TOKEN);
+                    if(receiverUser.image==null){
+                        receiverUser.image = value.getString(Constants.KEY_IMAGE);
+                        chatAdapter.setReceiverProfileImage(getBitmapFromEncodedImage(receiverUser.image));
+                        chatAdapter.notifyItemRangeChanged(0,chatMessageList.size());
                     }
 
                     if (isReceiverAvailabble){
@@ -176,8 +256,12 @@ public class ChatActivity extends BaseActivity {
     };
 
     private Bitmap getBitmapFromEncodedImage(String encodedImage){ //obtiene la imagen url y la pasa a formato Bitmap para mostrarla
-        byte[] bytes = Base64.decode(encodedImage,Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+        if(encodedImage!=null){
+            byte[] bytes = Base64.decode(encodedImage,Base64.DEFAULT);
+            return BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+        }else {
+            return null;
+        }
     }
 
     public void loadReceiverDetails(){
