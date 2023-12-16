@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.example.connectapp.R;
 import com.example.connectapp.adapters.ChatAdapter;
 import com.example.connectapp.databinding.ActivityChatBinding;
+import com.example.connectapp.firebase.MessagingService;
 import com.example.connectapp.models.ChatMessage;
 import com.example.connectapp.models.Users;
 import com.example.connectapp.network.ApiClient;
@@ -33,6 +34,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -74,6 +76,7 @@ public class ChatActivity extends BaseActivity {
     }
 
     private void init(){
+
         preferenceManager  = new PreferenceManager(getApplicationContext());
         chatMessageList = new ArrayList<>();
         chatAdapter = new ChatAdapter(chatMessageList,getBitmapFromEncodedImage(receiverUser.image),preferenceManager.getString(Constants.KEY_USER_ID));
@@ -104,6 +107,7 @@ public class ChatActivity extends BaseActivity {
             addConversion(conversion);
         }
         if (!isReceiverAvailabble){//si el otro usuario no esta online entonces le enviamos la notificaion del mensaje
+            Log.d("msg-test","El user: "+receiverUser.token+" esta offline");
             try {
                 JSONArray tokens = new JSONArray();
                 tokens.put(receiverUser.token); //token del usuario con el que estamos chateando | a quien le manda el mensaje
@@ -119,7 +123,6 @@ public class ChatActivity extends BaseActivity {
                 body.put(Constants.REMOTE_MSG_REGISTRATION_IDS,tokens); // token del usuario destino
 
                 sendNotification(body.toString());//Envio de notificacion
-                Log.d("msg-test","envio de notificacion");
 
 
             }catch (Exception e){
@@ -160,11 +163,12 @@ public class ChatActivity extends BaseActivity {
 
                     @Override
                     public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-
+                        Log.d("msg-test","Error: onFailure");
                     }
                 });
 
     }
+
     public void showToast(String message){
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }

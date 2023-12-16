@@ -9,7 +9,7 @@ public class ApiClient {
         if(retrofit==null){
             retrofit = new Retrofit.Builder()
                     .baseUrl("https://fcm.googleapis.com/fcm/")
-                    .addConverterFactory(ScalarsConverterFactory.create()) /*estás indicando que deseas convertir la respuesta del servidor a un tipo de dato String*/
+                    .addConverterFactory(ScalarsConverterFactory.create())/*estás indicando que deseas convertir la respuesta del servidor a un tipo de dato String*/
                     .build();
         }
         return retrofit;

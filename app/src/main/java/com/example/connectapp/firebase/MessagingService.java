@@ -39,7 +39,6 @@ public class MessagingService extends FirebaseMessagingService {
         user.name = remoteMessage.getData().get(Constants.KEY_NAME);
         user.token = remoteMessage.getData().get(Constants.KEY_FCM_TOKEN);
 
-        int notificationId = new Random().nextInt();
         String channelID = "chat_message"; //nombre del canal de notificaciones
 
         // Luego de hacer clic en la notificaicon te redirige a la vista
@@ -72,7 +71,7 @@ public class MessagingService extends FirebaseMessagingService {
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            notificationManagerCompat.notify(notificationId, builder.build());
+            notificationManagerCompat.notify(1, builder.build());
         }
 
         //Log.d("fcm","Message: "+remoteMessage.getNotification().getBody());
