@@ -103,7 +103,6 @@ public class ChatActivity extends BaseActivity {
             conversion.put(Constants.KEY_TIMESTAMP, new Date());
             addConversion(conversion);
         }
-
         if (!isReceiverAvailabble){//si el otro usuario no esta online entonces le enviamos la notificaion del mensaje
             try {
                 JSONArray tokens = new JSONArray();
@@ -120,10 +119,11 @@ public class ChatActivity extends BaseActivity {
                 body.put(Constants.REMOTE_MSG_REGISTRATION_IDS,tokens); // token del usuario destino
 
                 sendNotification(body.toString());//Envio de notificacion
+                Log.d("msg-test","envio de notificacion");
 
 
             }catch (Exception e){
-                showToast(e.getMessage());
+                showToast("Error: "+e.getMessage());
             }
         }
 

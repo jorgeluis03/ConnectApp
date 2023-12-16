@@ -86,6 +86,7 @@ public class MainActivity extends BaseActivity implements ConversionListener {
             Log.d("msg-test","Error: Diferente de nulo");
             return;
         }
+
         for (DocumentChange documentChange : value.getDocumentChanges()) { //monitoreo los cambios de el documento
             if (documentChange.getType()==DocumentChange.Type.ADDED){
                 String senderId = documentChange.getDocument().getString(Constants.KEY_SENDER_ID);
@@ -121,11 +122,16 @@ public class MainActivity extends BaseActivity implements ConversionListener {
                 }
             }
 
-            Collections.sort(conversion,(obj1,obj2)->obj2.dateObjetc.compareTo(obj1.dateObjetc));
-            recentConversationAdapter.notifyDataSetChanged();
-            binding.conversationRecyclerView.smoothScrollToPosition(0);
-            binding.conversationRecyclerView.setVisibility(View.VISIBLE);
-            binding.progressBar.setVisibility(View.GONE);
+            if(conversion.size()>0){
+                Collections.sort(conversion,(obj1,obj2)->obj2.dateObjetc.compareTo(obj1.dateObjetc));
+                recentConversationAdapter.notifyDataSetChanged();
+                binding.conversationRecyclerView.smoothScrollToPosition(0);
+                binding.conversationRecyclerView.setVisibility(View.VISIBLE);
+                binding.progressBar.setVisibility(View.GONE);
+            }else {
+                binding.progressBar.setVisibility(View.GONE);
+            }
+
         }
     };
 

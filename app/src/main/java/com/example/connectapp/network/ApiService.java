@@ -8,7 +8,7 @@ import retrofit2.http.HeaderMap;
 import retrofit2.http.POST;
 
 public interface ApiService {
-    @POST("/send")
+    @POST("send")
     Call<String> sendMessage(@HeaderMap HashMap<String,String> headers, @Body String messageBody);
 
     /*Los encabezados son información adicional que puedes incluir en tu solicitud, como tokens de autorización, por ejemplo.*/
